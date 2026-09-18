@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import SectionLayout from "../../../layouts/SectionLayout.astro";
-import ProjectCard from "../../../components/ProjectCard.astro";
+import FilterableProjects from "../../../components/FilterableProjects.astro";
 
 const projects = (await getCollection("projects", ({ data }) => data.page === "digital")).sort(
   (a, b) => a.data.order - b.data.order || b.data.year - a.data.year
@@ -15,23 +15,16 @@ const projects = (await getCollection("projects", ({ data }) => data.page === "d
   tagline="Digital & experiences."
 >
   <p class="section-note">
-    The technique filter (VR, TouchDesigner, audio-reactive...) is coming in the next step —
-    here's every project in the meantime.
+    The sliding project side panel is coming in the next step — for now a click opens the
+    dedicated page.
   </p>
-  <div class="project-grid">
-    {projects.map((project) => <ProjectCard project={project} />)}
-  </div>
+  <FilterableProjects projects={projects} mode="digital" />
 </SectionLayout>
 
 <style>
   .section-note {
     color: var(--fg-muted);
     font-size: var(--text-small);
-    margin-bottom: var(--space-5);
-  }
-  .project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-    gap: var(--space-4);
+    margin-bottom: var(--space-4);
   }
 </style>

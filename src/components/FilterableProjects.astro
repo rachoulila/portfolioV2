@@ -1,0 +1,332 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { PROJECT_TYPE_OPTIONS, CLIENT_TYPE_OPTIONS } from "../content/config";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import ProjectResultItem from "./ProjectResultItem.astro";
+
+interface Props {
+  projects: CollectionEntry<"projects">[];
+  mode: "design" | "digital";
+}
+const { projects, mode } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const techniqueOptions = [...new Set(projects.flatMap((p) => p.data.techniques))].sort((a, b) =>
+  a.localeCompare(b)
+);
+const hasMusicTheme = mode === "design";
+---
+
+<div class="filterable">
+  <details class="filter-sidebar" data-filter-root open>
+    <summary class="filter-sidebar__toggle">{t("filters.toggle")}</summary>
+    <div class="filter-sidebar__body">
+      <div class="filter-sidebar__top">
+        <p class="filter-sidebar__count">
+          <span data-results-count>{projects.length}</span>
+          {t("filters.results_other")}
+        </p>
+        <button type="button" class="filter-sidebar__reset" data-reset>{t("filters.reset")}</button>
+      </div>
+
+      {
+        mode === "design" && (
+          <>
+            <fieldset class="filter-group" data-group="type">
+              <legend>{t("filters.type")}</legend>
+              {PROJECT_TYPE_OPTIONS.map((option) => (
+                <label class="pill filter-pill">
+                  <input type="checkbox" name="type" value={option} />
+                  {option}
+                </label>
+              ))}
+            </fieldset>
+
+            <fieldset class="filter-group" data-group="client">
+              <legend>{t("filters.client")}</legend>
+              {CLIENT_TYPE_OPTIONS.map((option) => (
+                <label class="pill filter-pill">
+                  <input type="checkbox" name="client" value={option} />
+                  {option}
+                </label>
+              ))}
+            </fieldset>
+          </>
+        )
+      }
+
+      {
+        hasMusicTheme && (
+          <button type="button" class="pill filter-pill filter-theme" data-theme-toggle aria-pressed="false">
+            {t("filters.music")}
+          </button>
+        )
+      }
+
+      <details class="filter-more">
+        <summary>{t("filters.more")}</summary>
+        <fieldset class="filter-group" data-group="technique">
+          <legend class="visually-hidden">{t("filters.technique")}</legend>
+          {
+            techniqueOptions.map((option) => (
+              <label class="pill filter-pill">
+                <input type="checkbox" name="technique" value={option} />
+                {option}
+              </label>
+            ))
+          }
+        </fieldset>
+      </details>
+
+      <div class="view-toggle" role="group" aria-label="Vue">
+        <button type="button" class="view-toggle__btn" data-view-btn="grid" aria-pressed="true">
+          {t("filters.view.grid")}
+        </button>
+        <button type="button" class="view-toggle__btn" data-view-btn="list" aria-pressed="false">
+          {t("filters.view.list")}
+        </button>
+      </div>
+    </div>
+  </details>
+
+  <div class="project-results" data-results data-view="grid">
+    {projects.map((project) => <ProjectResultItem project={project} />)}
+  </div>
+</div>
+
+<style>
+  .filterable {
+    display: grid;
+    grid-template-columns: 16rem 1fr;
+    gap: var(--space-5);
+    align-items: start;
+  }
+  @media (max-width: 64rem) {
+    .filterable {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .filter-sidebar {
+    border: var(--rule);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+  }
+  .filter-sidebar__toggle {
+    display: none;
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+  }
+  .filter-sidebar__toggle::-webkit-details-marker {
+    display: none;
+  }
+  @media (max-width: 64rem) {
+    .filter-sidebar__toggle {
+      display: block;
+    }
+    .filter-sidebar__body {
+      margin-top: var(--space-3);
+    }
+  }
+
+  .filter-sidebar__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+    font-size: var(--text-small);
+  }
+  .filter-sidebar__count {
+    margin: 0;
+    color: var(--fg-muted);
+  }
+  .filter-sidebar__reset {
+    background: none;
+    border: none;
+    color: var(--fg-muted);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+  }
+
+  .filter-group {
+    border: 0;
+    padding: 0;
+    margin: 0 0 var(--space-4);
+  }
+  .filter-group legend {
+    font-size: var(--text-small);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--fg-muted);
+    padding: 0;
+    margin-bottom: var(--space-2);
+  }
+  .filter-pill {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin: 0 var(--space-1) var(--space-1) 0;
+    cursor: pointer;
+  }
+  .filter-pill input {
+    accent-color: var(--fg);
+  }
+  .filter-theme {
+    margin-bottom: var(--space-4);
+    cursor: pointer;
+  }
+  .filter-theme[aria-pressed="true"] {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  .filter-more summary {
+    cursor: pointer;
+    font-size: var(--text-small);
+    color: var(--fg-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  .view-toggle {
+    display: flex;
+    gap: var(--space-1);
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: var(--rule);
+  }
+  .view-toggle__btn {
+    flex: 1;
+    padding: var(--space-1) var(--space-2);
+    border: var(--rule);
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--text-small);
+  }
+  .view-toggle__btn[aria-pressed="true"] {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  .project-results[data-view="grid"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-4);
+  }
+  .project-results[data-view="list"] {
+    display: block;
+  }
+</style>
+
+<script>
+  function initFilters(root: HTMLDetailsElement) {
+    const resultsContainer = document.querySelector<HTMLElement>("[data-results]");
+    if (!resultsContainer) return;
+    const items = Array.from(resultsContainer.querySelectorAll<HTMLElement>("[data-result-item]"));
+    const groups = Array.from(root.querySelectorAll<HTMLFieldSetElement>("[data-group]"));
+    const themeToggle = root.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+    const resetBtn = root.querySelector<HTMLButtonElement>("[data-reset]");
+    const countEl = root.querySelector<HTMLElement>("[data-results-count]");
+    const viewButtons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-view-btn]"));
+
+    const params = new URLSearchParams(location.search);
+
+    function getState(): Record<string, string[]> {
+      const state: Record<string, string[]> = {};
+      groups.forEach((g) => {
+        const key = g.dataset.group!;
+        const checked = Array.from(g.querySelectorAll<HTMLInputElement>("input:checked")).map(
+          (i) => i.value
+        );
+        if (checked.length) state[key] = checked;
+      });
+      if (themeToggle?.getAttribute("aria-pressed") === "true") {
+        state.theme = ["musique"];
+      }
+      return state;
+    }
+
+    function syncURL(state: Record<string, string[]>, view: string) {
+      const usp = new URLSearchParams();
+      Object.entries(state).forEach(([key, values]) => {
+        if (key === "theme") {
+          usp.set("musique", "1");
+          return;
+        }
+        usp.set(key, values.join(","));
+      });
+      if (view !== "grid") usp.set("view", view);
+      const query = usp.toString();
+      history.replaceState(null, "", query ? `?${query}` : location.pathname);
+    }
+
+    function matches(item: HTMLElement, state: Record<string, string[]>) {
+      return Object.entries(state).every(([key, values]) => {
+        const itemValues = (item.dataset[key] || "").split("|").filter(Boolean);
+        return values.some((v) => itemValues.includes(v));
+      });
+    }
+
+    function render() {
+      const state = getState();
+      let visible = 0;
+      items.forEach((item) => {
+        const ok = matches(item, state);
+        item.hidden = !ok;
+        if (ok) visible++;
+      });
+      if (countEl) countEl.textContent = String(visible);
+      const view = resultsContainer!.dataset.view || "grid";
+      syncURL(state, view);
+    }
+
+    // Initialisation depuis l'URL (lien déjà filtré)
+    groups.forEach((g) => {
+      const key = g.dataset.group!;
+      const raw = params.get(key);
+      if (!raw) return;
+      const values = raw.split(",");
+      g.querySelectorAll<HTMLInputElement>("input").forEach((input) => {
+        if (values.includes(input.value)) input.checked = true;
+      });
+    });
+    if (themeToggle && params.get("musique") === "1") {
+      themeToggle.setAttribute("aria-pressed", "true");
+    }
+    if (params.get("view") === "list") {
+      resultsContainer.dataset.view = "list";
+      viewButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.viewBtn === "list")));
+    }
+
+    groups.forEach((g) => g.addEventListener("change", render));
+    themeToggle?.addEventListener("click", () => {
+      const pressed = themeToggle.getAttribute("aria-pressed") === "true";
+      themeToggle.setAttribute("aria-pressed", String(!pressed));
+      render();
+    });
+    resetBtn?.addEventListener("click", () => {
+      groups.forEach((g) => g.querySelectorAll<HTMLInputElement>("input").forEach((i) => (i.checked = false)));
+      themeToggle?.setAttribute("aria-pressed", "false");
+      render();
+    });
+    viewButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        resultsContainer!.dataset.view = btn.dataset.viewBtn!;
+        viewButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+        render();
+      });
+    });
+
+    render();
+  }
+
+  document
+    .querySelectorAll<HTMLDetailsElement>("[data-filter-root]")
+    .forEach((root) => initFilters(root));
+</script>

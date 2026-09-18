@@ -1,0 +1,115 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getLangFromUrl, pick, useTranslatedPath } from "../i18n/utils";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+const { project } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const translatePath = useTranslatedPath(lang);
+const cover = typeof project.data.cover === "string" ? project.data.cover : project.data.cover.src;
+
+const dataTypes = project.data.types.join("|");
+const dataClient = project.data.client_type;
+const dataTechniques = project.data.techniques.join("|");
+const dataThemes = project.data.themes.join("|");
+---
+
+<a
+  class="result-card"
+  href={translatePath(`/${project.data.page}/${project.slug}/`)}
+  data-result-item
+  data-type={dataTypes}
+  data-client={dataClient}
+  data-technique={dataTechniques}
+  data-theme={dataThemes}
+>
+  <span class="result-card__media">
+    <img src={cover} alt="" loading="lazy" />
+  </span>
+  <span class="result-card__year">{project.data.year}</span>
+  <span class="result-card__body">
+    <strong class="result-card__title">{pick(project.data.title, lang)}</strong>
+    <span class="result-card__client">{project.data.client_name} · {project.data.client_type}</span>
+    <span class="result-card__summary">{pick(project.data.summary, lang)}</span>
+    <span class="result-card__tags">
+      {project.data.types.map((t) => <span class="tag">{t}</span>)}
+      {project.data.techniques.map((t) => <span class="tag">{t}</span>)}
+    </span>
+  </span>
+</a>
+
+<style>
+  .result-card {
+    display: block;
+    text-decoration: none;
+    color: var(--fg);
+  }
+  .result-card__media {
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: var(--rule);
+    margin-bottom: var(--space-2);
+  }
+  .result-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition);
+  }
+  .result-card:hover .result-card__media img {
+    transform: scale(1.03);
+  }
+  .result-card__year {
+    display: none;
+  }
+  .result-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .result-card__title {
+    font-size: 1.1rem;
+  }
+  .result-card__client {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+  }
+  .result-card__summary {
+    display: none;
+  }
+  .result-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-1);
+  }
+
+  /* Vue liste : rangées avec filets, réf. index Fluxum */
+  :global([data-view="list"]) .result-card {
+    display: grid;
+    grid-template-columns: 5rem 4rem 1fr 1fr;
+    align-items: start;
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-top: var(--rule);
+  }
+  :global([data-view="list"]) .result-card__media {
+    aspect-ratio: 1 / 1;
+    margin-bottom: 0;
+  }
+  :global([data-view="list"]) .result-card__year {
+    display: block;
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+    padding-top: var(--space-1);
+  }
+  :global([data-view="list"]) .result-card__summary {
+    display: block;
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+  }
+</style>

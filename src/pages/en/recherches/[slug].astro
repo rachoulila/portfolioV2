@@ -1,5 +1,5 @@
 ---
-import { getCollection, getEntryBySlug } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import SectionLayout from "../../../layouts/SectionLayout.astro";
 import { getLangFromUrl, pick, useTranslations, useTranslatedPath } from "../../../i18n/utils";
 import { splitBilingualBody } from "../../../i18n/bilingualBody";
@@ -15,7 +15,7 @@ const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 const html = splitBilingualBody(article.body, lang);
 const relatedProject = article.data.related
-  ? await getEntryBySlug("projects", article.data.related)
+  ? await getEntry("projects", article.data.related)
   : undefined;
 const dateFormat = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
 ---
