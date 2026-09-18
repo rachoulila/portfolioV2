@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import SectionLayout from "../../layouts/SectionLayout.astro";
 import FilterableProjects from "../../components/FilterableProjects.astro";
+import ProjectPanel from "../../components/ProjectPanel.astro";
 
 const projects = (await getCollection("projects", ({ data }) => data.page === "digital")).sort(
   (a, b) => a.data.order - b.data.order || b.data.year - a.data.year
@@ -14,17 +15,7 @@ const projects = (await getCollection("projects", ({ data }) => data.page === "d
   accent="var(--accent-digital)"
   tagline="Digital & expériences."
 >
-  <p class="section-note">
-    Le panneau latéral coulissant sur la fiche projet arrive à l'étape suivante — pour l'instant
-    un clic ouvre la page dédiée.
-  </p>
   <FilterableProjects projects={projects} mode="digital" />
 </SectionLayout>
 
-<style>
-  .section-note {
-    color: var(--fg-muted);
-    font-size: var(--text-small);
-    margin-bottom: var(--space-4);
-  }
-</style>
+<ProjectPanel />

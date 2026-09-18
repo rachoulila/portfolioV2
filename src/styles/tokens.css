@@ -4,8 +4,9 @@
 */
 :root {
   /* Typo (placeholders Fontsource, à remplacer facilement) */
-  --font-display: "Instrument Serif", Georgia, serif;
+  --font-display: "Hanken Grotesk", system-ui, sans-serif;
   --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+  --font-accent: "Instrument Serif", Georgia, serif;
 
   /* Fond / texte neutres */
   --bg: #f6f4ef;

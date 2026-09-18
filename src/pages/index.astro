@@ -13,20 +13,37 @@ const t = useTranslations(lang);
   description="Designeuse — design graphique, expériences digitales, recherche, musique."
 >
   <Header />
-  <main id="main" class="wrap home">
-    <p class="home__intro">{t("home.intro")}</p>
-    <HomeGrid />
-  </main>
+  <div class="home__hero">
+    <main id="main" class="wrap home">
+      <p class="home__intro">{t("home.intro")}</p>
+      <HomeGrid />
+    </main>
+  </div>
 </BaseLayout>
 
 <style>
+  .home__hero {
+    background: radial-gradient(
+        ellipse 60% 50% at 15% 0%,
+        color-mix(in srgb, var(--accent-design) 22%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 55% 45% at 85% 10%,
+        color-mix(in srgb, var(--accent-digital) 20%, transparent),
+        transparent 70%
+      );
+  }
   .home {
     padding-block: var(--space-6);
   }
   .home__intro {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
     font-size: var(--text-h2);
     max-width: 42ch;
     margin-bottom: var(--space-5);
-    color: var(--fg-muted);
+    color: var(--fg);
   }
 </style>

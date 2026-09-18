@@ -10,6 +10,16 @@
   box-sizing: border-box;
 }
 
+/*
+  Règle défensive : garantit que l'attribut `hidden` masque toujours
+  l'élément, même quand un composant lui donne par ailleurs une règle
+  `display` explicite de même spécificité (ex. `.result-card { display:
+  block }`) qui gagnerait sinon la cascade sur le style UA par défaut.
+*/
+[hidden] {
+  display: none !important;
+}
+
 html {
   color-scheme: light dark;
 }
@@ -83,6 +93,110 @@ a {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/*
+  Fiche projet + galerie : classes globales (pas de scoping Astro) car ce
+  contenu est aussi injecté par fetch()/innerHTML dans le panneau latéral
+  depuis une autre page (voir ProjectPanel.astro).
+*/
+.fiche__eyebrow {
+  color: var(--fg-muted);
+  font-size: var(--text-small);
+  margin: 0 0 var(--space-1);
+}
+.fiche__header h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-size: var(--text-h1);
+  margin: 0 0 var(--space-3);
+}
+.fiche__summary {
+  font-size: var(--text-h2);
+  max-width: 48ch;
+  margin: 0 0 var(--space-4);
+}
+.fiche__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin: 0 0 var(--space-3);
+}
+.fiche__facts dt {
+  font-size: var(--text-small);
+  color: var(--fg-muted);
+}
+.fiche__facts dd {
+  margin: 0;
+  font-weight: 500;
+}
+.fiche__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-5);
+}
+.fiche__body {
+  max-width: 60ch;
+  margin: var(--space-5) 0;
+  line-height: 1.7;
+}
+.fiche__organisation {
+  margin: var(--space-5) 0;
+  padding: var(--space-4);
+  border: var(--rule);
+  border-radius: var(--radius-md);
+}
+.fiche__organisation h2 {
+  font-size: var(--text-small);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+}
+.fiche__organisation dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+}
+.fiche__links {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.fiche__links a {
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+}
+.gallery__item {
+  margin: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: var(--rule);
+}
+.gallery__item img,
+.gallery__item video,
+.gallery__item iframe {
+  width: 100%;
+  aspect-ratio: var(--ratio);
+  object-fit: cover;
+  border: 0;
+  display: block;
+}
+.gallery__item figcaption {
+  padding: var(--space-2);
+  font-size: var(--text-small);
+  color: var(--fg-muted);
 }
 
 @media (prefers-reduced-motion: reduce) {

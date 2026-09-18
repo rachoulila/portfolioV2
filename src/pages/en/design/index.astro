@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import SectionLayout from "../../../layouts/SectionLayout.astro";
 import FilterableProjects from "../../../components/FilterableProjects.astro";
+import ProjectPanel from "../../../components/ProjectPanel.astro";
 
 const projects = (await getCollection("projects", ({ data }) => data.page === "design")).sort(
   (a, b) => a.data.order - b.data.order || b.data.year - a.data.year
@@ -14,17 +15,7 @@ const projects = (await getCollection("projects", ({ data }) => data.page === "d
   accent="var(--accent-design)"
   tagline="Graphic & digital design."
 >
-  <p class="section-note">
-    The sliding project side panel is coming in the next step — for now a click opens the
-    dedicated page.
-  </p>
   <FilterableProjects projects={projects} mode="design" />
 </SectionLayout>
 
-<style>
-  .section-note {
-    color: var(--fg-muted);
-    font-size: var(--text-small);
-    margin-bottom: var(--space-4);
-  }
-</style>
+<ProjectPanel />

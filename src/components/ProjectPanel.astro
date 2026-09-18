@@ -1,0 +1,266 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div class="project-panel-backdrop" data-panel-backdrop aria-hidden="true"></div>
+<aside
+  class="project-panel"
+  data-panel
+  role="dialog"
+  aria-modal="true"
+  aria-label={t("project.close")}
+  aria-hidden="true"
+>
+  <div class="project-panel__toolbar">
+    <div class="project-panel__nav-group">
+      <button type="button" class="project-panel__nav" data-panel-prev aria-label={t("project.prev")}>
+        ←
+      </button>
+      <button type="button" class="project-panel__nav" data-panel-next aria-label={t("project.next")}>
+        →
+      </button>
+    </div>
+    <button type="button" class="project-panel__close" data-panel-close aria-label={t("project.close")}>
+      ✕
+    </button>
+  </div>
+  <div class="project-panel__content" data-panel-content tabindex="-1"></div>
+</aside>
+
+<style>
+  .project-panel-backdrop {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in srgb, black 40%, transparent);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--transition), visibility 0s linear 180ms;
+    z-index: 60;
+  }
+  .project-panel-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity var(--transition), visibility 0s linear 0s;
+  }
+
+  .project-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100dvh;
+    width: 65vw;
+    max-width: 62rem;
+    background: var(--bg);
+    border-left: var(--rule);
+    box-shadow: -20px 0 40px -20px rgba(0, 0, 0, 0.25);
+    transform: translateX(100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform var(--transition), visibility 0s linear 180ms;
+    z-index: 61;
+    display: flex;
+    flex-direction: column;
+  }
+  .project-panel.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition: transform var(--transition), visibility 0s linear 0s;
+  }
+  @media (max-width: 56rem) {
+    .project-panel {
+      width: 100vw;
+      max-width: none;
+    }
+  }
+
+  .project-panel__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--rule);
+    flex: none;
+  }
+  .project-panel__nav-group {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .project-panel__nav,
+  .project-panel__close {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: var(--rule);
+    background: var(--bg-elevated);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .project-panel__nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .project-panel__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-5) var(--space-6);
+  }
+  @media (max-width: 56rem) {
+    .project-panel__content {
+      padding: var(--space-4);
+    }
+  }
+
+  :global(body.panel-open) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  const backdrop = document.querySelector<HTMLElement>("[data-panel-backdrop]");
+  const panel = document.querySelector<HTMLElement>("[data-panel]");
+
+  if (backdrop && panel) {
+    const content = panel.querySelector<HTMLElement>("[data-panel-content]")!;
+    const closeBtn = panel.querySelector<HTMLButtonElement>("[data-panel-close]")!;
+    const prevBtn = panel.querySelector<HTMLButtonElement>("[data-panel-prev]")!;
+    const nextBtn = panel.querySelector<HTMLButtonElement>("[data-panel-next]")!;
+
+    const listingPathname = location.pathname;
+    let historyDepth = 0;
+    let isOpen = false;
+    let lastFocused: HTMLElement | null = null;
+
+    const getVisibleItems = () =>
+      Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-result-item]")).filter(
+        (el) => !el.hidden
+      );
+
+    function updateNavState(href: string) {
+      const items = getVisibleItems();
+      const idx = items.findIndex((a) => a.getAttribute("href") === href);
+      prevBtn.disabled = idx <= 0;
+      nextBtn.disabled = idx === -1 || idx >= items.length - 1;
+      prevBtn.dataset.targetHref = idx > 0 ? items[idx - 1].getAttribute("href")! : "";
+      nextBtn.dataset.targetHref =
+        idx !== -1 && idx < items.length - 1 ? items[idx + 1].getAttribute("href")! : "";
+    }
+
+    async function loadInto(href: string) {
+      content.innerHTML = "";
+      try {
+        const res = await fetch(href);
+        if (!res.ok) return;
+        const text = await res.text();
+        const doc = new DOMParser().parseFromString(text, "text/html");
+        const fiche = doc.querySelector("[data-fiche]");
+        if (fiche) content.appendChild(fiche);
+        const fetchedTitle = doc.querySelector("title")?.textContent;
+        if (fetchedTitle) document.title = fetchedTitle;
+      } finally {
+        updateNavState(href);
+        closeBtn.focus();
+      }
+    }
+
+    function onKeydown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closePanel();
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusables = Array.from(
+          panel!.querySelectorAll<HTMLElement>('a, button:not([disabled]), [tabindex]')
+        ).filter((el) => el.offsetParent !== null);
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    function renderPanel(href: string) {
+      isOpen = true;
+      backdrop!.setAttribute("aria-hidden", "false");
+      panel!.setAttribute("aria-hidden", "false");
+      backdrop!.classList.add("is-open");
+      panel!.classList.add("is-open");
+      document.body.classList.add("panel-open");
+      document.addEventListener("keydown", onKeydown);
+      loadInto(href);
+    }
+
+    function openPanel(href: string, trigger?: HTMLElement) {
+      lastFocused = trigger ?? (document.activeElement as HTMLElement | null);
+      historyDepth += 1;
+      history.pushState({ panel: true }, "", href);
+      renderPanel(href);
+    }
+
+    function hidePanelVisual() {
+      isOpen = false;
+      backdrop!.setAttribute("aria-hidden", "true");
+      panel!.setAttribute("aria-hidden", "true");
+      backdrop!.classList.remove("is-open");
+      panel!.classList.remove("is-open");
+      document.body.classList.remove("panel-open");
+      document.removeEventListener("keydown", onKeydown);
+      content.innerHTML = "";
+      lastFocused?.focus();
+    }
+
+    function closePanel() {
+      // On revient exactement d'où l'on vient (avec les filtres actifs à
+      // ce moment-là) plutôt que de forcer une URL figée au chargement.
+      if (historyDepth > 0) {
+        history.go(-historyDepth);
+      } else {
+        hidePanelVisual();
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>("[data-result-item]");
+      if (!link) return;
+      const mouseEvent = e as MouseEvent;
+      if (mouseEvent.button !== 0 || mouseEvent.metaKey || mouseEvent.ctrlKey || mouseEvent.shiftKey || mouseEvent.altKey) {
+        return;
+      }
+      e.preventDefault();
+      openPanel(link.getAttribute("href")!, link);
+    });
+
+    closeBtn.addEventListener("click", closePanel);
+    backdrop.addEventListener("click", closePanel);
+    prevBtn.addEventListener("click", () => {
+      const href = prevBtn.dataset.targetHref;
+      if (href) openPanel(href);
+    });
+    nextBtn.addEventListener("click", () => {
+      const href = nextBtn.dataset.targetHref;
+      if (href) openPanel(href);
+    });
+
+    window.addEventListener("popstate", () => {
+      if (location.pathname === listingPathname) {
+        historyDepth = 0;
+        if (isOpen) hidePanelVisual();
+      } else {
+        historyDepth = 1;
+        renderPanel(location.pathname + location.search);
+      }
+    });
+  }
+</script>

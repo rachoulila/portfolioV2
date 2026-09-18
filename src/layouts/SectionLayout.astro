@@ -19,8 +19,10 @@ const t = useTranslations(lang);
 <BaseLayout title={title} description={description}>
   <div style={`--section-accent:${accent}`}>
     <Header showBack />
+    <div class="section__hero">
+      <p class="wrap section__tagline">{tagline}</p>
+    </div>
     <main id="main" class="wrap section">
-      <p class="section__tagline">{tagline}</p>
       <slot />
       <footer class="section__contact">
         <h2>{t("contact.title")}</h2>
@@ -31,16 +33,26 @@ const t = useTranslations(lang);
 </BaseLayout>
 
 <style>
+  .section__hero {
+    background: radial-gradient(
+      ellipse 70% 100% at 20% 0%,
+      color-mix(in srgb, var(--section-accent) 30%, transparent),
+      transparent 75%
+    );
+    padding-block: var(--space-6) var(--space-5);
+  }
   .section {
-    padding-block: var(--space-6);
+    padding-block: 0 var(--space-6);
   }
   .section__tagline {
     font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
     font-size: var(--text-display);
-    line-height: 1.02;
+    line-height: 0.95;
     max-width: 20ch;
-    margin: 0 0 var(--space-6);
-    color: var(--section-accent, var(--fg));
+    margin: 0;
+    color: var(--fg);
   }
   .section__contact {
     margin-top: var(--space-7);

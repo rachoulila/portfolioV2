@@ -56,31 +56,4 @@ const ratios: Record<MediaItem["format"], string> = {
   )
 }
 
-<style>
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-    gap: var(--space-3);
-    margin: var(--space-5) 0;
-  }
-  .gallery__item {
-    margin: 0;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: var(--rule);
-  }
-  .gallery__item img,
-  .gallery__item video,
-  .gallery__item iframe {
-    width: 100%;
-    aspect-ratio: var(--ratio);
-    object-fit: cover;
-    border: 0;
-    display: block;
-  }
-  .gallery__item figcaption {
-    padding: var(--space-2);
-    font-size: var(--text-small);
-    color: var(--fg-muted);
-  }
-</style>
+<!-- Style dans global.css : voir la note dans ProjectFiche.astro (contenu transplanté dans le panneau). -->

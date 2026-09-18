@@ -27,6 +27,10 @@ const dataThemes = project.data.themes.join("|");
 >
   <span class="result-card__media">
     <img src={cover} alt="" loading="lazy" />
+    <span class="result-card__badges">
+      {project.data.types[0] && <span class="chip chip--solid">{project.data.types[0]}</span>}
+      <span class="chip chip--outline">{project.data.client_type}</span>
+    </span>
   </span>
   <span class="result-card__year">{project.data.year}</span>
   <span class="result-card__body">
@@ -47,6 +51,7 @@ const dataThemes = project.data.themes.join("|");
     color: var(--fg);
   }
   .result-card__media {
+    position: relative;
     display: block;
     aspect-ratio: 4 / 3;
     overflow: hidden;
@@ -59,6 +64,33 @@ const dataThemes = project.data.themes.join("|");
     height: 100%;
     object-fit: cover;
     transition: transform var(--transition);
+  }
+  .result-card__badges {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    display: flex;
+    gap: var(--space-1);
+    flex-wrap: wrap;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem var(--space-2);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .chip--solid {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .chip--outline {
+    background: color-mix(in srgb, var(--bg) 75%, transparent);
+    color: var(--fg);
+    border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent);
+    backdrop-filter: blur(2px);
   }
   .result-card:hover .result-card__media img {
     transform: scale(1.03);
@@ -100,6 +132,9 @@ const dataThemes = project.data.themes.join("|");
   :global([data-view="list"]) .result-card__media {
     aspect-ratio: 1 / 1;
     margin-bottom: 0;
+  }
+  :global([data-view="list"]) .result-card__badges {
+    display: none;
   }
   :global([data-view="list"]) .result-card__year {
     display: block;

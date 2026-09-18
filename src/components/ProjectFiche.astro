@@ -87,74 +87,9 @@ const html = splitBilingualBody(project.body, lang);
   }
 </article>
 
-<style>
-  .fiche__eyebrow {
-    color: var(--fg-muted);
-    font-size: var(--text-small);
-    margin: 0 0 var(--space-1);
-  }
-  .fiche__header h1 {
-    font-family: var(--font-display);
-    font-size: var(--text-h1);
-    margin: 0 0 var(--space-3);
-  }
-  .fiche__summary {
-    font-size: var(--text-h2);
-    max-width: 48ch;
-    margin: 0 0 var(--space-4);
-  }
-  .fiche__facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-5);
-    margin: 0 0 var(--space-3);
-  }
-  .fiche__facts dt {
-    font-size: var(--text-small);
-    color: var(--fg-muted);
-  }
-  .fiche__facts dd {
-    margin: 0;
-    font-weight: 500;
-  }
-  .fiche__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-    margin-bottom: var(--space-5);
-  }
-  .fiche__body {
-    max-width: 60ch;
-    margin: var(--space-5) 0;
-    line-height: 1.7;
-  }
-  .fiche__organisation {
-    margin: var(--space-5) 0;
-    padding: var(--space-4);
-    border: var(--rule);
-    border-radius: var(--radius-md);
-  }
-  .fiche__organisation h2 {
-    font-size: var(--text-small);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--fg-muted);
-  }
-  .fiche__organisation dl {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    margin: 0;
-  }
-  .fiche__links {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-  }
-  .fiche__links a {
-    text-decoration: none;
-    font-weight: 500;
-  }
-</style>
+<!--
+  Pas de <style> ici : ce composant est aussi injecté tel quel (fetch +
+  innerHTML) dans le panneau latéral (ProjectPanel.astro) depuis une autre
+  page. Ses classes .fiche__* sont donc stylées dans global.css (CSS
+  globale, pas de scoping Astro) pour rester correctes une fois transplantées.
+-->
