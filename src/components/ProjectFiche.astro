@@ -1,0 +1,160 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getLangFromUrl, pick, useTranslations } from "../i18n/utils";
+import { splitBilingualBody } from "../i18n/bilingualBody";
+import MediaGallery from "./MediaGallery.astro";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+const { project } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const html = splitBilingualBody(project.body, lang);
+---
+
+<article class="fiche" data-fiche>
+  <header class="fiche__header">
+    <p class="fiche__eyebrow">
+      {project.data.year} — {project.data.client_name}
+    </p>
+    <h1>{pick(project.data.title, lang)}</h1>
+    <p class="fiche__summary">{pick(project.data.summary, lang)}</p>
+    <dl class="fiche__facts">
+      <div>
+        <dt>{t("project.role")}</dt>
+        <dd>{project.data.role}</dd>
+      </div>
+      <div>
+        <dt>{t("project.client")}</dt>
+        <dd>{project.data.client_name} ({project.data.client_type})</dd>
+      </div>
+      <div>
+        <dt>{t("project.year")}</dt>
+        <dd>{project.data.year}</dd>
+      </div>
+    </dl>
+    <div class="fiche__tags">
+      {project.data.types.map((type) => <span class="tag">{type}</span>)}
+      {project.data.techniques.map((tech) => <span class="tag">{tech}</span>)}
+    </div>
+  </header>
+
+  <MediaGallery media={project.data.media} />
+
+  <div class="fiche__body" set:html={html} />
+
+  {
+    project.data.organisation && (
+      <section class="fiche__organisation">
+        <h2>{t("project.organisation")}</h2>
+        <dl>
+          {project.data.organisation.team && (
+            <div>
+              <dt>{t("project.team")}</dt>
+              <dd>{project.data.organisation.team}</dd>
+            </div>
+          )}
+          {project.data.organisation.duration && (
+            <div>
+              <dt>{t("project.duration")}</dt>
+              <dd>{project.data.organisation.duration}</dd>
+            </div>
+          )}
+          {project.data.organisation.deliverables && (
+            <div>
+              <dt>{t("project.deliverables")}</dt>
+              <dd>{pick(project.data.organisation.deliverables, lang)}</dd>
+            </div>
+          )}
+        </dl>
+      </section>
+    )
+  }
+
+  {
+    project.data.links.length > 0 && (
+      <ul class="fiche__links">
+        {project.data.links.map((link) => (
+          <li>
+            <a href={link.url} target="_blank" rel="noopener noreferrer">
+              {pick(link.label, lang)} ↗
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>
+
+<style>
+  .fiche__eyebrow {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+    margin: 0 0 var(--space-1);
+  }
+  .fiche__header h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    margin: 0 0 var(--space-3);
+  }
+  .fiche__summary {
+    font-size: var(--text-h2);
+    max-width: 48ch;
+    margin: 0 0 var(--space-4);
+  }
+  .fiche__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    margin: 0 0 var(--space-3);
+  }
+  .fiche__facts dt {
+    font-size: var(--text-small);
+    color: var(--fg-muted);
+  }
+  .fiche__facts dd {
+    margin: 0;
+    font-weight: 500;
+  }
+  .fiche__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-bottom: var(--space-5);
+  }
+  .fiche__body {
+    max-width: 60ch;
+    margin: var(--space-5) 0;
+    line-height: 1.7;
+  }
+  .fiche__organisation {
+    margin: var(--space-5) 0;
+    padding: var(--space-4);
+    border: var(--rule);
+    border-radius: var(--radius-md);
+  }
+  .fiche__organisation h2 {
+    font-size: var(--text-small);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--fg-muted);
+  }
+  .fiche__organisation dl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: 0;
+  }
+  .fiche__links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .fiche__links a {
+    text-decoration: none;
+    font-weight: 500;
+  }
+</style>

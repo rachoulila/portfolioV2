@@ -1,0 +1,39 @@
+pdf:
+  fr: "/cv/rachel-truchot-cv-fr.pdf"
+  en: "/cv/rachel-truchot-cv-en.pdf"
+timeline:
+  - year: "2024"
+    kind: experience
+    title:
+      fr: "Designeuse freelance"
+      en: "Freelance designer"
+    place: "Indépendante"
+    description:
+      fr: "Identité visuelle, print et dispositifs digitaux pour associations, artistes et écoles."
+      en: "Visual identity, print and digital devices for non-profits, artists and schools."
+  - year: "2022–2023"
+    kind: experience
+    title:
+      fr: "Studio Rëva"
+      en: "Studio Rëva"
+    place: "Studio Rëva"
+    description:
+      fr: "Design graphique et scénographie pour des événements culturels."
+      en: "Graphic design and scenography for cultural events."
+  - year: "2021"
+    kind: experience
+    title:
+      fr: "Deezer"
+      en: "Deezer"
+    place: "Deezer"
+    description:
+      fr: "Contenus visuels et déclinaisons social media pour les campagnes éditoriales."
+      en: "Visual content and social media declinations for editorial campaigns."
+  - year: "2018–2021"
+    kind: formation
+    title:
+      fr: "École de design"
+      en: "Design school"
+    description:
+      fr: "Design graphique et numérique."
+      en: "Graphic and digital design."

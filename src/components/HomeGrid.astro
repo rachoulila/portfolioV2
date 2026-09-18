@@ -1,0 +1,87 @@
+---
+import { casquettes } from "../config/site";
+import { getLangFromUrl, pick, useTranslations, useTranslatedPath } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+---
+
+<div class="home-grid">
+  {
+    casquettes.map((c) => {
+      const isSoon = c.kind === "soon";
+      const href = isSoon ? undefined : c.kind === "internal" ? translatePath(c.href!) : c.href;
+      const Tag = isSoon ? "div" : "a";
+      return (
+        <Tag
+          class="home-grid__item"
+          style={`--tile-color:${c.color}`}
+          href={href}
+          {...(c.kind === "external" ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          aria-disabled={isSoon ? "true" : undefined}
+        >
+          <span class="home-grid__label">{pick(c.label, lang)}</span>
+          <span class="home-grid__tagline">{pick(c.tagline, lang)}</span>
+          {isSoon && <span class="pill home-grid__badge">{t("status.soon")}</span>}
+          {c.kind === "external" && <span class="pill home-grid__badge">↗</span>}
+        </Tag>
+      );
+    })
+  }
+</div>
+
+<style>
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+  @media (min-width: 56rem) {
+    .home-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .home-grid__item:nth-child(1),
+    .home-grid__item:nth-child(2) {
+      grid-column: span 2;
+    }
+  }
+  .home-grid__item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--space-1);
+    min-height: 12rem;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--tile-color) 18%, var(--bg-elevated));
+    border: var(--rule);
+    text-decoration: none;
+    color: var(--fg);
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .home-grid__item:not([aria-disabled="true"]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--tile-color) 60%, transparent);
+  }
+  .home-grid__item[aria-disabled="true"] {
+    opacity: 0.7;
+    cursor: default;
+  }
+  .home-grid__label {
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    line-height: 1;
+  }
+  .home-grid__tagline {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+    max-width: 28ch;
+  }
+  .home-grid__badge {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+  }
+</style>

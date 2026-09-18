@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import SectionLayout from "../../../layouts/SectionLayout.astro";
+import ProjectCard from "../../../components/ProjectCard.astro";
+
+const projects = (await getCollection("projects", ({ data }) => data.page === "design")).sort(
+  (a, b) => a.data.order - b.data.order || b.data.year - a.data.year
+);
+---
+
+<SectionLayout
+  title="Design"
+  description="Visual identity, print, web, events — projects by Rachel Truchot."
+  accent="var(--accent-design)"
+  tagline="Graphic & digital design."
+>
+  <p class="section-note">
+    Filters (type, client, technique, music) and the project side panel are coming in the next
+    step — here's every project in the meantime.
+  </p>
+  <div class="project-grid">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </div>
+</SectionLayout>
+
+<style>
+  .section-note {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+    margin-bottom: var(--space-5);
+  }
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-4);
+  }
+</style>

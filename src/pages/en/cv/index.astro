@@ -1,0 +1,21 @@
+---
+import { getEntry } from "astro:content";
+import SectionLayout from "../../../layouts/SectionLayout.astro";
+import Timeline from "../../../components/Timeline.astro";
+import { useTranslations } from "../../../i18n/utils";
+
+const cv = await getEntry("cv", "cv");
+const t = useTranslations("en");
+---
+
+<SectionLayout
+  title="CV"
+  description="Rachel Truchot's background — education and experience."
+  accent="var(--accent-digital)"
+  tagline="Background."
+>
+  <p>
+    <a class="pill" href={cv.data.pdf.en} download>{t("cv.download")} (EN)</a>
+  </p>
+  <Timeline items={cv.data.timeline} />
+</SectionLayout>

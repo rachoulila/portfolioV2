@@ -1,0 +1,84 @@
+---
+import { getCollection, getEntryBySlug } from "astro:content";
+import SectionLayout from "../../layouts/SectionLayout.astro";
+import { getLangFromUrl, pick, useTranslations, useTranslatedPath } from "../../i18n/utils";
+import { splitBilingualBody } from "../../i18n/bilingualBody";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("research");
+  return articles.map((article) => ({ params: { slug: article.slug }, props: { article } }));
+}
+
+const { article } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const html = splitBilingualBody(article.body, lang);
+const relatedProject = article.data.related
+  ? await getEntryBySlug("projects", article.data.related)
+  : undefined;
+const dateFormat = new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", {
+  dateStyle: "long",
+});
+---
+
+<SectionLayout
+  title={pick(article.data.title, lang)}
+  description={pick(article.data.summary, lang)}
+  accent="var(--accent-recherches)"
+  tagline="Recherches"
+>
+  <article class="article">
+    <p class="article__date">{dateFormat.format(article.data.date)}</p>
+    <h1>{pick(article.data.title, lang)}</h1>
+    <div class="article__tags">
+      {article.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+    </div>
+    <div class="article__body" set:html={html} />
+
+    {
+      article.data.pdf && (
+        <p>
+          <a href={article.data.pdf}>{t("research.pdf")}</a>
+        </p>
+      )
+    }
+
+    {
+      relatedProject && (
+        <p class="article__related">
+          {t("research.related")}:{" "}
+          <a href={translatePath(`/${relatedProject.data.page}/${relatedProject.slug}/`)}>
+            {pick(relatedProject.data.title, lang)}
+          </a>
+        </p>
+      )
+    }
+  </article>
+</SectionLayout>
+
+<style>
+  .article__date {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+  }
+  .article h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    margin: var(--space-1) 0 var(--space-3);
+  }
+  .article__tags {
+    display: flex;
+    gap: var(--space-1);
+    margin-bottom: var(--space-4);
+  }
+  .article__body {
+    max-width: 60ch;
+    line-height: 1.7;
+  }
+  .article__related {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: var(--rule);
+  }
+</style>

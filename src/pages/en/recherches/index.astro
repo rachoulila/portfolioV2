@@ -1,0 +1,69 @@
+---
+import { getCollection } from "astro:content";
+import SectionLayout from "../../../layouts/SectionLayout.astro";
+import { getLangFromUrl, pick, useTranslatedPath } from "../../../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const translatePath = useTranslatedPath(lang);
+const articles = (await getCollection("research")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const dateFormat = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" });
+---
+
+<SectionLayout
+  title="Research"
+  description="Research notes and editions by Rachel Truchot."
+  accent="var(--accent-recherches)"
+  tagline="Research notes."
+>
+  <ul class="article-list">
+    {
+      articles.map((article) => (
+        <li>
+          <a href={translatePath(`/recherches/${article.slug}/`)}>
+            <span class="article-list__date">{dateFormat.format(article.data.date)}</span>
+            <h2>{pick(article.data.title, lang)}</h2>
+            <p>{pick(article.data.summary, lang)}</p>
+            <div class="article-list__tags">
+              {article.data.tags.map((tag) => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</SectionLayout>
+
+<style>
+  .article-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .article-list li {
+    border-top: var(--rule);
+    padding-block: var(--space-4);
+  }
+  .article-list a {
+    text-decoration: none;
+    color: var(--fg);
+    display: block;
+  }
+  .article-list__date {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+  }
+  .article-list h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-h2);
+    margin: var(--space-1) 0;
+  }
+  .article-list__tags {
+    display: flex;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+</style>

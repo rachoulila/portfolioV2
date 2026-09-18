@@ -1,0 +1,57 @@
+---
+import LangSwitcher from "./LangSwitcher.astro";
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "../i18n/utils";
+import { site } from "../config/site";
+
+interface Props {
+  showBack?: boolean;
+}
+const { showBack = false } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+---
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="site-header__name" href={translatePath("/")}>{site.name}</a>
+    <div class="site-header__right">
+      {showBack && <a class="site-header__back" href={translatePath("/")}>{t("nav.back")}</a>}
+      <a class="site-header__cv" href={translatePath("/cv/")}>{t("nav.cv")}</a>
+      <LangSwitcher />
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: var(--rule);
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+  }
+  .site-header__name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    text-decoration: none;
+  }
+  .site-header__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--text-small);
+  }
+  .site-header__back,
+  .site-header__cv {
+    text-decoration: none;
+    color: var(--fg-muted);
+  }
+  .site-header__back:hover,
+  .site-header__cv:hover {
+    color: var(--fg);
+  }
+</style>

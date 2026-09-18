@@ -1,0 +1,23 @@
+---
+import { getCollection } from "astro:content";
+import SectionLayout from "../../layouts/SectionLayout.astro";
+import ProjectFiche from "../../components/ProjectFiche.astro";
+import { pick, getLangFromUrl } from "../../i18n/utils";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects", ({ data }) => data.page === "digital");
+  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+---
+
+<SectionLayout
+  title={pick(project.data.title, lang)}
+  description={pick(project.data.summary, lang)}
+  accent="var(--accent-digital)"
+  tagline="Digital"
+>
+  <ProjectFiche project={project} />
+</SectionLayout>

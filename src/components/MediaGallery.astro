@@ -1,0 +1,86 @@
+---
+import { getLangFromUrl, pick } from "../i18n/utils";
+
+interface MediaItem {
+  type: "image" | "video" | "youtube" | "vimeo";
+  src: string;
+  alt?: string;
+  caption?: { fr: string; en?: string };
+  format: "paysage" | "4:5" | "9:16" | "carré" | "libre";
+}
+
+interface Props {
+  media: MediaItem[];
+}
+const { media } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+
+const ratios: Record<MediaItem["format"], string> = {
+  paysage: "16 / 9",
+  "4:5": "4 / 5",
+  "9:16": "9 / 16",
+  carré: "1 / 1",
+  libre: "auto",
+};
+---
+
+{
+  media.length > 0 && (
+    <div class="gallery">
+      {media.map((item) => (
+        <figure class="gallery__item" style={`--ratio:${ratios[item.format]}`}>
+          {item.type === "image" && <img src={item.src} alt={item.alt ?? ""} loading="lazy" />}
+          {item.type === "video" && <video src={item.src} controls preload="metadata" />}
+          {item.type === "youtube" && (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${item.src}`}
+              title={item.alt ?? ""}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            />
+          )}
+          {item.type === "vimeo" && (
+            <iframe
+              src={`https://player.vimeo.com/video/${item.src}`}
+              title={item.alt ?? ""}
+              loading="lazy"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+            />
+          )}
+          {item.caption && <figcaption>{pick(item.caption, lang)}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-3);
+    margin: var(--space-5) 0;
+  }
+  .gallery__item {
+    margin: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: var(--rule);
+  }
+  .gallery__item img,
+  .gallery__item video,
+  .gallery__item iframe {
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    object-fit: cover;
+    border: 0;
+    display: block;
+  }
+  .gallery__item figcaption {
+    padding: var(--space-2);
+    font-size: var(--text-small);
+    color: var(--fg-muted);
+  }
+</style>

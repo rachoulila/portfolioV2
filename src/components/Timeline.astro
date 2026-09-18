@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getLangFromUrl, pick } from "../i18n/utils";
+
+interface Props {
+  items: CollectionEntry<"cv">["data"]["timeline"];
+}
+const { items } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+---
+
+<ol class="timeline">
+  {
+    items.map((item) => (
+      <li class="timeline__item" data-kind={item.kind}>
+        <span class="timeline__year">{item.year}</span>
+        <div>
+          <h3>{pick(item.title, lang)}</h3>
+          {item.place && <p class="timeline__place">{item.place}</p>}
+          {item.description && <p>{pick(item.description, lang)}</p>}
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .timeline__item {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: var(--space-4);
+    border-top: var(--rule);
+    padding-block: var(--space-4);
+  }
+  .timeline__year {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+  }
+  .timeline__item h3 {
+    margin: 0 0 var(--space-1);
+  }
+  .timeline__place {
+    color: var(--fg-muted);
+    font-size: var(--text-small);
+    margin: 0 0 var(--space-1);
+  }
+</style>
